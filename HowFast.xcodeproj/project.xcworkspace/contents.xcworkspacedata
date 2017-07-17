@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/Andrew/Documents/Geometry/HowFast.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>

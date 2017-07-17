@@ -65,7 +65,7 @@ class GameScene: SKScene {
         
         // MARK: Set High Score
         let oldHigh = UserDefaults.standard.double(forKey: "highScore")
-        highScoreLabel.text = String(Int(oldHigh))
+         highScoreLabel.text = String(Int(oldHigh))
         
         if oldHigh < currentHighSpeed {
             UserDefaults.standard.set(currentHighSpeed, forKey: "highScore")
