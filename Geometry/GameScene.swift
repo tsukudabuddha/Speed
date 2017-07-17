@@ -19,6 +19,12 @@ class GameScene: SKScene {
     var motionManager: CMMotionManager!
     var ball: SKShapeNode!
     var speedLabel: SKLabelNode!
+    var highSpeedLabel: SKLabelNode!
+    var beginLabel: SKLabelNode!
+    var gameState: GameState = .finished
+    
+    
+    var currentHighSpeed: Double = 0
     
     let accelerometerSpeed: CGFloat = 2000
     
@@ -28,24 +34,53 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         /* Runs on scene spawn */
-        
+        beginLabel = childNode(withName: "beginLabel") as! SKLabelNode
         /* Set up Motion Manager */
         motionManager = CMMotionManager()
         motionManager.startAccelerometerUpdates()
-        setupScene()
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         
+        if gameState != .running { return }
+        
         if let data = motionManager.accelerometerData {
             ball.physicsBody?.applyForce(CGVector(dx: accelerometerSpeed * CGFloat(data.acceleration.x), dy: accelerometerSpeed * CGFloat(data.acceleration.y)))
         }
         
+        /* Check currentSpeed and compare to highSpeed */
         let speed = ( (abs(Double((ball.physicsBody?.velocity.dx)!))) + (abs(Double((ball.physicsBody?.velocity.dy)!))) ) / 100
-        speedLabel.text = String(speed)
+        
+        if currentHighSpeed < speed {
+            currentHighSpeed = speed
+        }
+        
+        /* Print High Speed and Speed */
+        
+        highSpeedLabel.text = String(currentHighSpeed.rounded())
+        speedLabel.text = String(Int(speed))
+        
         
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        /* Get first touch */
+        let touch = touches.first!
+        
+        /* Get location of touch and see what it is touching */
+        let location = touch.location(in: self)
+        let touchedNode = self.atPoint(location)
+        
+        /* Check if the touched node is the begin label */
+        if touchedNode == beginLabel {
+            setupScene()
+            gameState = .running
+            beginLabel.isHidden = true
+        }
+    }
+    
     
     func setupScene() {
         
@@ -76,7 +111,7 @@ class GameScene: SKScene {
         self.addChild(self.ball)
         
         // Draw Middle circle
-        let middleCircle = SKShapeNode(circleOfRadius: 165) // Size of circle
+        let middleCircle = SKShapeNode(circleOfRadius: 150) // Size of circle
         middleCircle.position = originPoint
         middleCircle.strokeColor = UIColor.white
         middleCircle.glowWidth = 1
@@ -90,6 +125,10 @@ class GameScene: SKScene {
         
         speedLabel = SKLabelNode()
         addChild(speedLabel)
+        
+        highSpeedLabel = SKLabelNode()
+        highSpeedLabel.position.y += 40
+        addChild(highSpeedLabel)
 
     }
 }
