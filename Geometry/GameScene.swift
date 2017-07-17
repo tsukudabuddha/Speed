@@ -20,13 +20,14 @@ class GameScene: SKScene {
     var ball: SKShapeNode!
     var speedLabel: SKLabelNode!
     var highSpeedLabel: SKLabelNode!
+    var highScoreLabel: SKLabelNode!
     var beginLabel: SKLabelNode!
     var gameState: GameState = .finished
     
     
     var currentHighSpeed: Double = 0
     
-    let accelerometerSpeed: CGFloat = 2000
+    let accelerometerSpeed: CGFloat = 2500
     
     var time: CFTimeInterval = 0.0
     let delta: CFTimeInterval = 1.0 / 60.0
@@ -51,7 +52,7 @@ class GameScene: SKScene {
         }
         
         /* Check currentSpeed and compare to highSpeed */
-        let speed = ( (abs(Double((ball.physicsBody?.velocity.dx)!))) + (abs(Double((ball.physicsBody?.velocity.dy)!))) ) / 100
+        let speed = ( (abs(Double((ball.physicsBody?.velocity.dx)!))) + (abs(Double((ball.physicsBody?.velocity.dy)!))) ) / 50
         
         if currentHighSpeed < speed {
             currentHighSpeed = speed
@@ -59,8 +60,18 @@ class GameScene: SKScene {
         
         /* Print High Speed and Speed */
         
-        highSpeedLabel.text = String(currentHighSpeed.rounded())
+        highSpeedLabel.text = String(Int(currentHighSpeed))
         speedLabel.text = String(Int(speed))
+        
+        // MARK: Set High Score
+        let oldHigh = UserDefaults.standard.double(forKey: "highScore")
+        highScoreLabel.text = String(Int(oldHigh))
+        
+        if oldHigh < currentHighSpeed {
+            UserDefaults.standard.set(currentHighSpeed, forKey: "highScore")
+            highScoreLabel.text = String(Int(currentHighSpeed))
+        }
+
         
         
     }
@@ -129,6 +140,10 @@ class GameScene: SKScene {
         highSpeedLabel = SKLabelNode()
         highSpeedLabel.position.y += 40
         addChild(highSpeedLabel)
+        
+        highScoreLabel = SKLabelNode()
+        highScoreLabel.position.y = highSpeedLabel.position.y + 40
+        addChild(highScoreLabel)
 
     }
 }
